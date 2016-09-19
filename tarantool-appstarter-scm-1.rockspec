@@ -1,0 +1,31 @@
+-- package = 'tarantool-appstarter'
+-- version = 'scm-1'
+-- source  = {
+--     url    = 'git://github.com/igorcoding/tarantool-appstarter.git',
+--     branch = 'master',
+-- }
+-- description = {
+--     summary  = "Package for starting up tarantool applications",
+--     homepage = 'https://github.com/igorcoding/tarantool-appstarter',
+--     license  = 'BSD',
+-- }
+-- dependencies = {
+--     'lua >= 5.1',
+--     'luafilesystem',
+-- }
+-- build = {
+--     type = 'builtin',
+--     install = {
+--         bin = {
+--             'tntstartapp'
+--         }
+--     },
+--     modules = {
+--         ['startapp'] = 'startapp.lua'
+--     },
+--     copy_directories = {
+--         'template'
+--     }
+-- }
+
+-- vim: syntax=lua
