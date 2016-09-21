@@ -20,6 +20,14 @@ local function merge_tables(t, ...)
 	return t
 end
 
+local modes = fio.c.mode
+local perms = bit.bor(modes.S_IRUSR, modes.S_IWUSR,
+                      modes.S_IRGRP, modes.S_IWGRP,
+                      modes.S_IROTH, modes.S_IWOTH)
+local folder_perms = bit.bor(modes.S_IRUSR, modes.S_IWUSR, modes.S_IXUSR,
+                             modes.S_IRGRP, modes.S_IWGRP, modes.S_IXGRP,
+                             modes.S_IROTH,                modes.S_IXOTH)
+
 function listdir(path)
 	local files = {}
     for file in lfs.dir(path) do
@@ -78,7 +86,9 @@ local function render_file(filepath, opts)
 	local s = read_file(filepath)
 	local new_s = render(s, opts)
 	
-	local fh = fio.open(filepath, {'O_WRONLY', 'O_TRUNC'})
+	local src_mode = fio.stat(filepath).mode
+	
+	local fh = fio.open(filepath, {'O_WRONLY', 'O_TRUNC'}, src_mode)
 	if not fh then
 	    errorf("Failed to open file %s: %s", filepath, errno.strerror())
 	end
@@ -92,8 +102,14 @@ local function copyfile(src, dest)
 	if not src_fh then
 	    errorf("Failed to open file %s: %s", src, errno.strerror())
 	end
+	local src_mode = fio.stat(src).mode
 	
-	local dest_fh = fio.open(dest, {'O_WRONLY', 'O_CREAT'})
+	local local_perms = bit.bor(perms,
+	                            bit.band(src_mode, fio.c.mode.S_IXUSR),
+	                            bit.band(src_mode, fio.c.mode.S_IXGRP),
+	                            bit.band(src_mode, fio.c.mode.S_IXOTH))
+	
+	local dest_fh = fio.open(dest, {'O_WRONLY', 'O_CREAT'}, local_perms)
 	if not dest_fh then
 	    errorf("Failed to open file %s: %s", dest, errno.strerror())
 	end
@@ -128,7 +144,7 @@ local function copydir(src, dest)
 		local p = fio.pathjoin(dest, relative_path)
 		
 		if fmode == 'directory' then
-			local ok = fio.mkdir(p)
+			local ok = fio.mkdir(p, folder_perms)
 			if not ok then
 				errorf("Couln't create folder %s: %s", p, errno.strerror())
 			end

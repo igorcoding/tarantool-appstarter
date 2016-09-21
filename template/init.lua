@@ -11,11 +11,9 @@ local conf_path = os.getenv('CONF')
 if conf_path == nil then
 	conf_path = '/etc/{{__appname__}}/conf.lua'
 end
-local conf = require('config')(conf_path)
+require('config')(conf_path)
 
-local app = require('app')
-package.reload:register(app)
-app.start(conf.get('app'))
+require('app')
 
 if tonumber(os.getenv('DEV')) == 1 then
 	require('console').start()

@@ -10,3 +10,6 @@ clean:
 
 run:
 	./scripts/run.sh
+	
+dep:
+	./dep.py --meta-file=./meta.yaml --luarocks-tree=./libs

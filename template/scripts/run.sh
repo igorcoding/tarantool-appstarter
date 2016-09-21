@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-ROOT=${SCRIPT_DIR}/..
+ROOT=`realpath ${SCRIPT_DIR}/..`
 
 . ${SCRIPT_DIR}/tnt-env.sh
 mkdir -p ${ROOT}/tnt
