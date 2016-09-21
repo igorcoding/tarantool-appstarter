@@ -1,6 +1,5 @@
 #! /usr/bin/env tarantool
 
-local lib = require('startapp')
 local fio = require('fio')
 
 local function isroot(s)
@@ -60,6 +59,10 @@ local function main()
 	local cur = debug.getinfo(2,"S").source:sub(2)
 	local curdir = cur:match("(.*/)")
 	local rootdir = fio.pathjoin(curdir, '..')
+	print(rootdir)
+	package.path = rootdir .. '/?.lua;' .. rootdir .. '/?/init.lua;' .. package.path
+	
+	local lib = require('startapp')
 	
 	local workdir = get_workdir('.')
 	io.write("Tarantool app will be created in the following directory: " .. workdir .. "\n")
