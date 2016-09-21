@@ -1,4 +1,4 @@
-.PHONY: test run clean
+.PHONY: test run clean dep
 
 all: test
 
