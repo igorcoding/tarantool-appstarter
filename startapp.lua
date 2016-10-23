@@ -31,7 +31,6 @@ local folder_perms = bit.bor(modes.S_IRUSR, modes.S_IWUSR, modes.S_IXUSR,
                              modes.S_IROTH,                modes.S_IXOTH)
 
 local function get_mode(file_path)
-	print(file_path)
 	local f_mode = fio.stat(file_path).mode
 	local is_directory = (bit.band(f_mode, S_IFDIR) > 0)
 	local is_file = (bit.band(f_mode, S_IFREG) > 0)
@@ -43,27 +42,26 @@ local function get_mode(file_path)
 end
 
 function listdir(path)
-	print('path: ', path)
 	local files = {}
-    for _, file in ipairs(fio.glob(path .. '/*')) do
-        if file ~= "." and file ~= ".." then
-            local mode = get_mode(file)
-            table.insert(files, {
-            	mode = mode,
-            	path = file
-        	})
-            if mode == "directory" then
-                files = merge_tables(files, listdir(file))
-            end
-        end
-    end
-    return files
+	for _, file in ipairs(fio.glob(path .. '/*')) do
+		if file ~= "." and file ~= ".." then
+			local mode = get_mode(file)
+			table.insert(files, {
+				mode = mode,
+				path = file
+			})
+			if mode == "directory" then
+				files = merge_tables(files, listdir(file))
+			end
+		end
+	end
+	return files
 end
 
 local function read_file(filepath)
 	local fh = fio.open(filepath, {'O_RDONLY'})
 	if not fh then
-	    errorf("Failed to open file %s: %s", filepath, errno.strerror())
+		errorf("Failed to open file %s: %s", filepath, errno.strerror())
 	end
 	
 	local data = ''
@@ -103,7 +101,7 @@ local function render_file(filepath, opts)
 	
 	local fh = fio.open(filepath, {'O_WRONLY', 'O_TRUNC'}, src_mode)
 	if not fh then
-	    errorf("Failed to open file %s: %s", filepath, errno.strerror())
+		errorf("Failed to open file %s: %s", filepath, errno.strerror())
 	end
 	
 	fh:write(new_s)
@@ -113,7 +111,7 @@ end
 local function copyfile(src, dest)
 	local src_fh = fio.open(src, {'O_RDONLY'})
 	if not src_fh then
-	    errorf("Failed to open file %s: %s", src, errno.strerror())
+		errorf("Failed to open file %s: %s", src, errno.strerror())
 	end
 	local src_mode = fio.stat(src).mode
 	
@@ -124,7 +122,7 @@ local function copyfile(src, dest)
 	
 	local dest_fh = fio.open(dest, {'O_WRONLY', 'O_CREAT'}, local_perms)
 	if not dest_fh then
-	    errorf("Failed to open file %s: %s", dest, errno.strerror())
+		errorf("Failed to open file %s: %s", dest, errno.strerror())
 	end
 	
 	local data = nil
