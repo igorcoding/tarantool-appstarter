@@ -4,7 +4,6 @@ Tarantool application starter
 ### Requirements
 * tarantool >= 1.6
 * luarocks
-  - luafilesystem
 
 ### Run
 Clone and run

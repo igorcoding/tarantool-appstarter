@@ -1,6 +1,5 @@
 local errno = require('errno')
 local fio = require('fio')
-local lfs = require('lfs')
 local yaml = require('yaml')
 
 local function errorf(s, ...)
@@ -20,6 +19,9 @@ local function merge_tables(t, ...)
 	return t
 end
 
+local S_IFREG = tonumber('0100000', 8)  -- regular file
+local S_IFDIR = tonumber('0040000', 8)  -- directory
+
 local modes = fio.c.mode
 local perms = bit.bor(modes.S_IRUSR, modes.S_IWUSR,
                       modes.S_IRGRP, modes.S_IWGRP,
@@ -28,19 +30,30 @@ local folder_perms = bit.bor(modes.S_IRUSR, modes.S_IWUSR, modes.S_IXUSR,
                              modes.S_IRGRP, modes.S_IWGRP, modes.S_IXGRP,
                              modes.S_IROTH,                modes.S_IXOTH)
 
+local function get_mode(file_path)
+	print(file_path)
+	local f_mode = fio.stat(file_path).mode
+	local is_directory = (bit.band(f_mode, S_IFDIR) > 0)
+	local is_file = (bit.band(f_mode, S_IFREG) > 0)
+	
+	if is_directory then
+		return 'directory'
+	end
+	return 'file'
+end
+
 function listdir(path)
+	print('path: ', path)
 	local files = {}
-    for file in lfs.dir(path) do
+    for _, file in ipairs(fio.glob(path .. '/*')) do
         if file ~= "." and file ~= ".." then
-            local f = fio.pathjoin(path, file)
-            local attr = lfs.attributes(f)
-            assert(type(attr) == "table")
+            local mode = get_mode(file)
             table.insert(files, {
-            	mode = attr.mode,
-            	path = f
+            	mode = mode,
+            	path = file
         	})
-            if attr.mode == "directory" then
-                files = merge_tables(files, listdir(f))
+            if mode == "directory" then
+                files = merge_tables(files, listdir(file))
             end
         end
     end
