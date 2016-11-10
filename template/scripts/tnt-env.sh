@@ -8,3 +8,6 @@ ${ROOT}/app/?.lua;\
 ${ROOT}/app/?/init.lua;\
 ${ROOT}/libs/share/lua/5.1/?.lua;
 ${ROOT}/libs/share/lua/5.1/?/init.lua;;"
+
+LUA_CPATH="${ROOT}/libs/lib/lua/5.1/?.so;\
+${ROOT}/libs/lib/lua/?.so;;"
