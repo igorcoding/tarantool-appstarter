@@ -1,11 +1,14 @@
 local is_dev = tonumber(os.getenv("DEV")) == 1
 
+local listen_uri = os.getenv("LISTEN")
+if listen_uri == nil then
+	listen_uri = '127.0.0.1:3301'
+end
+
 box = {
-	listen = os.getenv("LISTEN_URI"),
+	listen = listen_uri,
 	slab_alloc_arena = 0.1,
-	background = not is_dev,
-	pid_file = "tarantool.pid",
-	-- logger = 'file:tarantool.log',
+	-- replication_source = { }
 }
 
 console = {
