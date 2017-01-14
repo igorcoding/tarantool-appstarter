@@ -19,4 +19,5 @@ require('app')
 
 if tonumber(os.getenv('DEV')) == 1 then
 	require('console').start()
+	os.exit(0)
 end
