@@ -1,31 +1,24 @@
 # {{__appname__}}
 
-## Запуск
-* `make dep` - Установит зависимости в папку ./libs
-* `make run` - Запустит тарантул в деве в папке ./tnt
-* `make test` - Запускает тесты
+_your application description_
 
-## Зависимости
-В состав приложения входит скрипт `dep.py`, задача которого - установить зависимости из мета-файла `meta.yaml`. `dep.py` внутри зовет luarocks, поэтому последний должен быть установлен в системе.
+## Commands
+* `make dep` - Installs dependencies to ./libs folder
+* `make run` - Runs Tarantool instance locally inside the ./tnt_{LISTEN_URI} folder. By default $LISTEN_URI = "127.0.0.1:3301"
+* `make test` - Runs tests from ./t folder
 
-Идея - создавать "виртуальное окружение", наподобие python virtualenv.
+## dep.py
+Script that installs dependencies (luarocks for lua 5.1 is required), specified in the `meta.yaml` file.
 
-`dep.py --help` - покажет возможности скрипта
+### depy.py commands
+* `./dep.py --help` - help, obviously
+* `./dep.py --meta-file=./meta.yaml` - installs deps from `meta.yaml` to the system
+* `./dep.py --meta-file=./meta.yaml --dev` - installs deps to the user (default is `~/.luarocks`).
+* `./dep.py --meta-file=./meta.yaml --luarocks-tree=./libs` - installs deps to a specified folder (ex. libs). `make run` calls this command.
 
-Основные моменты:
 
-* `./dep.py --meta-file=./meta.yaml` - установит завиимости в глобальный luarocks из файла `meta.yaml`.
-* `./dep.py --meta-file=./meta.yaml --dev` - установит зависимости в локальный luarocks (по умолчанию в `~/.luarocks`).
-* `./dep.py --meta-file=./meta.yaml --luarocks-tree=./libs` - установит все завиимости в конкретную папку (здесь - libs).
-
-Файл `init.lua` поддерживает внутри себя расширение package.path папкой `libs`, лежащей рядом с `init.lua`, поэтому, для разработки достаточно выполнить команду
-```bash
-./dep.py --meta-file=./meta.yaml --luarocks-tree=./libs
-```
-и можно уже запускать `./run.sh` (или `make run`), что стартанет тарантул в папке `./tnt`.
-
-## RPM
-При установке RPM получается следующая структура:
+## Deploy
+To deploy application the recommended directory structure is the following:
 ```
 /
 ├── etc
@@ -38,3 +31,5 @@
             ├── app/
             └── libs/
 ```
+You need to put a symlink `/etc/tarantool/instances.enabled/{appname}.lua -> /usr/share/{appname}/init.lua
+` and you are ready to start your application by either `tarantoolctl start {appname}` or, if you're using systemd - `systemctl start tarantool@{appname}`
