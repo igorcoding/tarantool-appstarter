@@ -31,5 +31,5 @@ To deploy application the recommended directory structure is the following:
             ├── app/
             └── libs/
 ```
-You need to put a symlink `/etc/tarantool/instances.enabled/{appname}.lua -> /usr/share/{appname}/init.lua
-` and you are ready to start your application by either `tarantoolctl start {appname}` or, if you're using systemd - `systemctl start tarantool@{appname}`
+You need to put a symlink `/etc/tarantool/instances.enabled/{{__appname__}}.lua -> /usr/share/{{__appname__}}/init.lua
+` and you are ready to start your application by either `tarantoolctl start {{__appname__}}` or, if you're using systemd - `systemctl start tarantool@{{__appname__}}`
