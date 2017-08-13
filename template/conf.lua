@@ -1,13 +1,15 @@
+local is_dev = tonumber(os.getenv("DEV")) == 1
+
 box = {
-	listen = os.getenv("LISTEN_URI") or "127.0.0.1:3301",
-	slab_alloc_arena = 0.1,
-	background = not tonumber(os.getenv("DEV")) == 1,
+	listen = os.getenv("LISTEN") or "127.0.0.1:3301",
+	memtx_memory = 100 * 1024 * 1024, -- 100 MB
+	background = not is_dev,
 	
 	-- snapshot_period = 3600,
 	-- snapshot_count  = 2,
 	
 	pid_file = "tarantool.pid",
-	-- logger = 'file:tarantool.log',
+	-- log = 'file:tarantool.log',
 	-- replication_source = { }
 }
 

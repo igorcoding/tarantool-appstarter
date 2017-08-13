@@ -21,12 +21,17 @@ local function tnt_prepare(cfg_args)
         end
     end
 
-    cfg_args['wal_dir']    = dir
-    cfg_args['snap_dir']   = dir
-    cfg_args['vinyl']      = {}
-    cfg_args['logger']     = fio.pathjoin(dir, 'tarantool.log')
+    if require('tarantool').version >= "1.7.3" then
+        cfg_args['memtx_dir']  = dir
+        cfg_args['log']        = "file:" .. fio.pathjoin(dir, 'tarantool.log')
+    else
+        cfg_args['wal_dir']    = dir
+        cfg_args['snap_dir']   = dir
+        cfg_args['vinyl']      = {}
+        cfg_args['logger']     = fio.pathjoin(dir, 'tarantool.log')
+    end
 
-    box.cfg (cfg_args)
+    box.cfg(cfg_args)
 end
 
 return {

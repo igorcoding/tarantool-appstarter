@@ -19,20 +19,20 @@ tntstartapp .
 
 ## Rationale
 
-The main idea behind this appstarter is to provide you with a default approach of developing apps for Tarantool. 
-To create a project starter you can run 
+The main idea behind this appstarter is to provide you with a default approach of developing apps for Tarantool.
+To create a project starter you can run
 ```
 mkdir -p /path/to/app
 tntstartapp /path/to/app
-``` 
+```
 
 And you'll end up with a default structure of an app. There are some important parts in it:
 1) `dep.py` and `meta.yaml`. Luarocks spec files does not support specifying dependencies on GH projects (via link to *.rockspec file), but the luarocks itself does. So, `meta.yaml` is a place where you drop your external dependencies (like a package.json for npm or requirements.txt for pip). You can specify either tarantool modules there (in the `tntdeps` section) by there names (like `queue` or `http`) or just bare links to *.rockspec files (in the `deps` section). Then a bundled `dep.py` script will use this `meta.yaml` file to install all the required dependencies to a specified location.
 2) `Makefile`. There are 2 main commands there:
-* `make dep` - This command installs all the dependencies from meta.yaml to a local folder `libs` inside your project (already in bundled .gitignore)
-* `make run`. After a successful installation of dependencies you can run your application. Practically it just creates a temporary folder `tnt_{LISTEN_URI}`, `cd`'s inside and runs `tarantool init.lua`.
+* `make dep` - This command installs all the dependencies from meta.yaml to a local folder `.rocks` inside your project (already in bundled .gitignore)
+* `make run`. After a successful installation of dependencies you can run your application. Practically it just creates a temporary folder `.tnt_{LISTEN_URI}`, `cd`'s inside and runs `tarantool init.lua`.
 3) `init.lua` - An entry point to your entire application. Specifically, it does this:
-* patches package.path and package.cpath to import packages from ./libs and ./app folders directly.
+* patches package.path and package.cpath to import packages from ./.rocks and ./app folders directly.
 * `require`'s [package.reload module](https://github.com/Mons/tnt-package-reload)
 * `require`'s config module (please refer to @mons's [tnt-config module](https://github.com/Mons/tnt-config) for more details). By default (if not specified in ENV variable CONF) it uses config file from /etc/{your_app_name}/conf.lua
 * Runs `require('app')`. Which is essentially is run of your application.
@@ -52,9 +52,9 @@ The recommended way to deploy apps with `tarantool-appstarter` is to the followi
         └── {{__appname__}}
             ├── init.lua
             ├── app/
-            └── libs/
+            └── .rocks/
 ```
-As you can see, `init.lua`, `app folder` and `libs folder` (so you, obviously, need to bundle your dep or rpm package with your dependencies) deploy to `/usr/share/{appname}/`, and `conf.lua` deploys to `/etc/{appname}/conf.lua`. 
+As you can see, `init.lua`, `app folder` and `.rocks folder` (so you, obviously, need to bundle your dep or rpm package with your dependencies) deploy to `/usr/share/{appname}/`, and `conf.lua` deploys to `/etc/{appname}/conf.lua`.
 
 In order to run your applcation by either `tarantoolctl` or `systemd` you need to do the following:
 * put a symlink `/etc/tarantool/instances.enabled/{appname}.lua -> /usr/share/{appname}/init.lua`.

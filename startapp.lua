@@ -43,15 +43,17 @@ end
 
 function listdir(path)
 	local files = {}
-	for _, file in ipairs(fio.glob(path .. '/*')) do
-		if file ~= "." and file ~= ".." then
-			local mode = get_mode(file)
-			table.insert(files, {
-				mode = mode,
-				path = file
-			})
-			if mode == "directory" then
-				files = merge_tables(files, listdir(file))
+	for _, postfix in ipairs({'/*', '/.*'}) do
+		for _, file in ipairs(fio.glob(path .. postfix)) do
+			if fio.basename(file) ~= "." and fio.basename(file) ~= ".." then
+				local mode = get_mode(file)
+				table.insert(files, {
+					mode = mode,
+					path = file
+				})
+				if mode == "directory" then
+					files = merge_tables(files, listdir(file))
+				end
 			end
 		end
 	end
@@ -170,7 +172,9 @@ end
 local function start_app(rootdir, opts)
 	assert(opts.name ~= nil and opts.name ~= '', 'App name must be defined and should not be empty')
 	assert(opts.workdir ~= nil and opts.workdir ~= '', 'Workdir must be defined and should not be empty')
-	assert(fio.stat(opts.workdir) ~= nil, string.format('Workdir \'%s\' does not exist', opts.workdir))
+	if fio.stat(opts.workdir) == nil then
+		fio.mkdir(opts.workdir, folder_perms)
+	end
 	
 	local src = fio.pathjoin(rootdir, 'template')
 	copydir(src, opts.workdir)
