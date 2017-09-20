@@ -15,11 +15,21 @@ local app = {
 function app.start(config)
 	log.info('Starting app')
 	
-    app.{{__appname__}}.init(config)
+	for k, mod in pairs(app) do
+		if type(mod) == 'table' and mod.init ~= nil then
+			mod.init(config)
+		end
+	end
 end
 
 function app.destroy()
 	log.info('Unloading app')
+	
+	for k, mod in pairs(app) do
+		if type(mod) == 'table' and mod.destroy ~= nil then
+			mod.destroy()
+		end
+	end
 end
 
 package.reload:register(app)
