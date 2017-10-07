@@ -34,4 +34,4 @@ end
 
 package.reload:register(app)
 rawset(_G, 'app', app)
-app.start(conf.get('app'))
+return app
