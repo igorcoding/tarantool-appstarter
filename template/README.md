@@ -10,11 +10,10 @@ _your application description_
 ## dep.py
 Script that installs dependencies (luarocks for lua 5.1 is required), specified in the `meta.yaml` file.
 
-### depy.py commands
+### dep.py commands
 * `./dep.py --help` - help, obviously
 * `./dep.py --meta-file=./meta.yaml` - installs deps from `meta.yaml` to the system
-* `./dep.py --meta-file=./meta.yaml --dev` - installs deps to the user (default is `~/.luarocks`).
-* `./dep.py --meta-file=./meta.yaml --luarocks-tree=./.rocks` - installs deps to a specified folder (ex. .rocks). `make run` calls this command.
+* `./dep.py --meta-file=./meta.yaml --tree=./.rocks` - installs deps to a specified folder (ex. .rocks). `make dep` calls this command.
 
 
 ## Deploy

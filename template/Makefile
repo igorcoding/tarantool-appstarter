@@ -6,13 +6,13 @@ test:
 	./scripts/test.sh
 
 clean:
-	rm -rf .tnt_*
+	rm -rf .tnt*
 
 run:
-	./scripts/run.sh
-	
+	FG=1 CONF=./conf.lua tarantoolctl start init.lua
+
 dep:
-	./dep.py --meta-file=./meta.yaml --luarocks-tree=./.rocks
+	python dep.py --meta-file=./meta.yaml --tree=./.rocks
 
 rpm:
 	rpmbuild -ba --define="SRC_DIR ${PWD}" rpm/{{__appname__}}.spec

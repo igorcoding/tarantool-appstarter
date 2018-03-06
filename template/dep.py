@@ -12,13 +12,9 @@ from os.path import expanduser
 class Options:
     def __init__(self,
                  meta_config,
-                 meta_path,
-                 dev,
                  luarocks_config,
                  luarocks_tree):
         self.meta_config = meta_config
-        self.meta_path = meta_path
-        self.dev = dev
         self.luarocks_config = luarocks_config
         self.luarocks_tree = luarocks_tree
 
@@ -35,23 +31,43 @@ def ensure_tarantool_rocks_repo(luarocks_config):
                 return
 
     with open(luarocks_config, 'a') as f:
-        f.write('\nrocks_servers = {[[http://rocks.tarantool.org/]]}\n')
+        f.write("""\nrocks_servers = {
+	[[https://rocks.moonscript.org]],
+	[[http://rocks.tarantool.org/]],
+}\n""")
 
 
-def luarocks_install(dep, local=True, tree=None):
-    cmd = ['luarocks', 'install']
-    if tree:
-        cmd.append("--tree={0}".format(tree))
-    elif local:
-        cmd.append('--local')
-    cmd.append(dep)
-
+def exec_command(cmd):
     process = subprocess.Popen(cmd)
     exit_code = process.wait()
-    
     assert exit_code == 0, "{0} failed".format(cmd)
+    print('{0} finished with code {1}'.format(' '.join(cmd), exit_code))
+    return exit_code
 
-    print('{0} finished'.format(cmd, exit_code))
+def exec_luarocks(subcommand, dep, tree=None):
+    cmd = ['luarocks', subcommand, dep]
+    if tree:
+        cmd.append("--tree={0}".format(tree))
+    return exec_command(cmd)
+
+def exec_tarantoolctl(subcommand, dep, tree=None):
+    cmd = ['tarantoolctl', 'rocks', subcommand, dep]
+    return exec_command(cmd)
+
+def luarocks_install(dep, tree=None):
+    return exec_luarocks('install', dep, tree)
+
+def luarocks_remove(dep, tree=None):
+    return exec_luarocks('remove', cmd, tree)
+
+def luarocks_make(dep, tree=None):
+    return exec_luarocks('make', dep, tree)
+
+def tarantoolctl_install(dep, tree=None):
+    return exec_tarantoolctl('install', dep, tree)
+
+def tarantoolctl_make(dep, tree=None):
+    return exec_tarantoolctl('make', dep, tree)
 
 
 def run(opts):
@@ -66,6 +82,7 @@ def run(opts):
 
     general_deps = opts.meta_config.get('deps', [])
     tnt_deps = opts.meta_config.get('tntdeps', [])
+    local_deps = opts.meta_config.get('local', [])
 
     if not general_deps and not tnt_deps:
         fprint('Nothing to install')
@@ -73,46 +90,63 @@ def run(opts):
     if tnt_deps:
         ensure_tarantool_rocks_repo(opts.luarocks_config)
         for dep in tnt_deps:
-            luarocks_install(dep, local=opts.dev, tree=opts.luarocks_tree)
-            fprint('Installed tntdep: {0}'.format(dep))
+            fprint('Installing tntdep: {0}'.format(dep))
+            tarantoolctl_install(dep, tree=opts.luarocks_tree)
+            fprint('Installed tntdep: {0}\n\n'.format(dep))
 
     if general_deps:
         for dep in general_deps:
-            luarocks_install(dep, local=opts.dev, tree=opts.luarocks_tree)
-            fprint('Installed dep: {0}'.format(dep))
+            fprint('Installing dep: {0}'.format(dep))
+            luarocks_install(dep, tree=opts.luarocks_tree)
+            fprint('Installed dep: {0}\n\n'.format(dep))
+
+    if local_deps:
+        for dep in local_deps:
+            fprint('Installing local dep: {0}'.format(dep))
+            dep = os.path.abspath(dep)
+            cwd = os.getcwd()
+            dep_path = os.path.dirname(dep)
+            os.chdir(dep_path)
+            try:
+                try:
+                    luarocks_remove(dep, tree=opts.luarocks_tree)
+                except Exception as e:
+                    print('remove of {0} failed: {1}'.format(dep, str(e)))
+                luarocks_make(dep, tree=opts.luarocks_tree)
+            finally:
+                os.chdir(cwd)
+            fprint('Installed local dep: {0}\n\n'.format(dep))
 
     return 0
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--meta-file', help='meta.json file with tarantool deps', required=True)
-    parser.add_argument('--dev', help='pass True if this is dev', type=bool, default=False)
-    parser.add_argument('--json', help='use json meta file instead of yaml', type=bool, default=False)
+    parser.add_argument('--meta-file', help='meta.yaml file with tarantool deps', required=True)
     parser.add_argument('--luarocks-config',
                         help='path to luarocks config file',
                         type=str,
                         default=expanduser('~/.luarocks/config.lua'))
-    parser.add_argument('--luarocks-tree',
+    parser.add_argument('--tree',
                         help='path to luarocks installation tree',
                         type=str,
-                        default=None)
+                        default='.rocks')
     args = parser.parse_args()
 
     meta_file = os.path.abspath(args.meta_file)
     with open(meta_file, 'r') as f:
-        if args.json:
-            import json
-            meta_config = json.load(f, encoding='utf-8')
-        else:
+        try:
             import yaml
             meta_config = yaml.load(f)
+        except Exception as e:
+            print('Fall back to JSON parse due to: {}'.format(e))
+            import json
+            meta_config = json.load(f, encoding='utf-8')
 
+    tree = os.path.abspath(args.tree)
     opts = Options(meta_config=meta_config,
-                   meta_path=os.path.dirname(meta_file),
-                   dev=args.dev,
                    luarocks_config=args.luarocks_config,
-                   luarocks_tree=args.luarocks_tree)
+                   luarocks_tree=tree)
     return run(opts)
 
 if __name__ == "__main__":
