@@ -9,11 +9,11 @@ box.once('access:v1', function()
 end)
 
 local app = {
-    {{__appname__}} = require('{{__appname__}}'),
+    {{__appname__}} = require '{{__appname__}}',
 }
 
-function app.start(config)
-    log.info('Starting app')
+function app.init(config)
+    log.info('app init')
 
     for k, mod in pairs(app) do
         if type(mod) == 'table' and mod.init ~= nil then
@@ -23,7 +23,7 @@ function app.start(config)
 end
 
 function app.destroy()
-    log.info('Unloading app')
+    log.info('app destroy')
 
     for k, mod in pairs(app) do
         if type(mod) == 'table' and mod.destroy ~= nil then

@@ -6,7 +6,6 @@ local app
 function M.init(config)
     app = require 'app'
     M.config = config
-
 end
 
 function M.destroy()

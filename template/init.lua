@@ -16,8 +16,8 @@ local conf = require('config')(conf_path)
 
 require 'strict'.on()
 local app = require 'app'
-if app ~= nil and app.start ~= nil then
-    app.start(conf.get('app'))
+if app ~= nil and app.init ~= nil then
+    app.init(conf.get('app'))
 end
 
 if tonumber(os.getenv('FG')) == 1 then
