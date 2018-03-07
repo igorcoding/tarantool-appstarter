@@ -10,17 +10,17 @@ local fio = require 'fio'
 
 local conf_path = os.getenv('CONF')
 if conf_path == nil then
-	conf_path = '/etc/{{__appname__}}/conf.lua'
+    conf_path = '/etc/{{__appname__}}/conf.lua'
 end
 local conf = require('config')(conf_path)
 
 require 'strict'.on()
 local app = require 'app'
 if app ~= nil and app.start ~= nil then
-	app.start(conf.get('app'))
+    app.start(conf.get('app'))
 end
 
 if tonumber(os.getenv('FG')) == 1 then
-	require('console').start()
-	os.exit(0)
+    require('console').start()
+    os.exit(0)
 end

@@ -17,6 +17,6 @@ ${ROOT}/.rocks/lib/lua/?.so;\
 ${ROOT}/.rocks/lib64/lua/5.1/?.so;;"
 
 for t in ${ROOT}/t/*.lua; do
-	echo "Running `basename $t`..."
-	LUA_PATH=${LUA_PATH} LUA_CPATH=${LUA_CPATH} ${TARANTOOL} $t
+    echo "Running `basename $t`..."
+    LUA_PATH=${LUA_PATH} LUA_CPATH=${LUA_CPATH} ${TARANTOOL} $t
 done
