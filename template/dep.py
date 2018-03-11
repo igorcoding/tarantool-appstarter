@@ -2,11 +2,9 @@
 
 import argparse
 import os
-
 import sys
-
-import subprocess
 from os.path import expanduser
+import subprocess
 
 
 class Options:
@@ -17,7 +15,6 @@ class Options:
         self.meta_config = meta_config
         self.luarocks_config = luarocks_config
         self.luarocks_tree = luarocks_tree
-
 
 def ensure_tarantool_rocks_repo(luarocks_config):
     luarocks_config_dir = os.path.dirname(luarocks_config)
@@ -44,35 +41,32 @@ def exec_command(cmd):
     print('{0} finished with code {1}'.format(' '.join(cmd), exit_code))
     return exit_code
 
-def exec_luarocks(subcommand, dep, tree=None):
+
+def cmd_luarocks(subcommand, dep, tree=None):
     cmd = ['luarocks', subcommand, dep]
     if tree:
         cmd.append("--tree={0}".format(tree))
     return exec_command(cmd)
 
-def exec_tarantoolctl(subcommand, dep, tree=None):
+
+def cmd_tarantoolctl(subcommand, dep, tree=None):
     cmd = ['tarantoolctl', 'rocks', subcommand, dep]
     return exec_command(cmd)
 
-def luarocks_install(dep, tree=None):
-    return exec_luarocks('install', dep, tree)
 
-def luarocks_remove(dep, tree=None):
-    return exec_luarocks('remove', cmd, tree)
-
-def luarocks_make(dep, tree=None):
-    return exec_luarocks('make', dep, tree)
-
-def tarantoolctl_install(dep, tree=None):
-    return exec_tarantoolctl('install', dep, tree)
-
-def tarantoolctl_make(dep, tree=None):
-    return exec_tarantoolctl('make', dep, tree)
-
+def _gen(command, subcommand):
+    def f(dep, tree=None):
+        return command(subcommand, dep, tree)
+    return f
 
 def run(opts):
     app_name = opts.meta_config.get('name')
     assert app_name, 'name must be defined'
+
+    luarocks_install = _gen(cmd_luarocks, 'install')
+    luarocks_remove = _gen(cmd_luarocks, 'remove')
+    luarocks_make = _gen(cmd_luarocks, 'make')
+    tarantoolctl_install = _gen(cmd_tarantoolctl, 'install')
 
     # noinspection PyRedeclaration
     def fprint(s):
@@ -83,9 +77,6 @@ def run(opts):
     general_deps = opts.meta_config.get('deps', [])
     tnt_deps = opts.meta_config.get('tntdeps', [])
     local_deps = opts.meta_config.get('local', [])
-
-    if not general_deps and not tnt_deps:
-        fprint('Nothing to install')
 
     if tnt_deps:
         ensure_tarantool_rocks_repo(opts.luarocks_config)

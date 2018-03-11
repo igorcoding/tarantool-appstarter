@@ -12,6 +12,9 @@ run:
 	FG=1 CONF=./conf.lua tarantoolctl start init.lua
 
 dep:
+	tarantool dep.lua --meta-file ./meta.yaml --tree ./.rocks
+
+deppy:
 	python dep.py --meta-file=./meta.yaml --tree=./.rocks
 
 rpm:
