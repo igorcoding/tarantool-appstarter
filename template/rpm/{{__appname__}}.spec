@@ -35,8 +35,6 @@ BuildRequires: tarantool-devel >= 1.6.8
 BuildRequires: lua-devel >= 5.1
 BuildRequires: lua-devel < 5.2
 BuildRequires: luarocks
-BuildRequires: python-argparse
-BuildRequires: python-yaml
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
@@ -60,7 +58,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 make
 
 mkdir -p ./%{name}-%{version}-%{release}-rocks
-python dep.py --meta-file=./meta.yaml --luarocks-tree=./%{name}-%{version}-%{release}-rocks
+tarantool dep.lua --meta-file ./meta.yaml --tree ./%{name}-%{version}-%{release}-rocks
 
 %install
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}

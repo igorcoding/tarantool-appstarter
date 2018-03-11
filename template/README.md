@@ -7,13 +7,21 @@ _your application description_
 * `make run` - Runs Tarantool instance locally inside the ./.tnt_{LISTEN_URI} folder. By default $LISTEN_URI = "127.0.0.1:3301"
 * `make test` - Runs tests from ./t folder
 
-## dep.py
+## dep.lua
 Script that installs dependencies (luarocks for lua 5.1 is required), specified in the `meta.yaml` file.
 
-### dep.py commands
-* `./dep.py --help` - help, obviously
-* `./dep.py --meta-file=./meta.yaml` - installs deps from `meta.yaml` to the system
-* `./dep.py --meta-file=./meta.yaml --tree=./.rocks` - installs deps to a specified folder (ex. .rocks). `make dep` calls this command.
+### dep.lua commands
+* `tarantool dep.lua --meta-file ./meta.yaml` - installs deps from `meta.yaml` to the system
+* `tarantool dep.lua --meta-file ./meta.yaml --tree ./.rocks` - installs deps to a specified folder (ex. .rocks). `make dep` calls this command.
+
+
+### meta.yaml
+`meta.yaml` can have the following sections:
+* `name` - package name
+* `version` - package version
+* `deps` - list of paths to rockspec files or package names (each is installed using `luarocks install` command)
+* `tntdeps` - list of paths to rockspec files or package names (each is installed using `tarantoolctl rocks install` command)
+* `localdeps` - list of paths to local rockspec files (each is installed using `luarocks make` command)
 
 
 ## Deploy

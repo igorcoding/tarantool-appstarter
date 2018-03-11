@@ -27,7 +27,7 @@ tntstartapp /path/to/app
 ```
 
 And you'll end up with a default structure of an app. There are some important parts in it:
-1) `dep.py` and `meta.yaml`. Luarocks spec files does not support specifying dependencies on GH projects (via link to *.rockspec file), but the luarocks itself does. So, `meta.yaml` is a place where you drop your external dependencies (like a package.json for npm or requirements.txt for pip). You can specify either tarantool modules there (in the `tntdeps` section) by there names (like `queue` or `http`) or just bare links to *.rockspec files (in the `deps` section). Then a bundled `dep.py` script will use this `meta.yaml` file to install all the required dependencies to a specified location.
+1) `dep.lua` and `meta.yaml`. Luarocks spec files does not support specifying dependencies on GH projects (via link to *.rockspec file), but the luarocks itself does. So, `meta.yaml` is a place where you drop your external dependencies (like a package.json for npm or requirements.txt for pip). You can specify either tarantool modules there (in the `tntdeps` section) by there names (like `queue` or `http`) or just bare links to *.rockspec files (in the `deps` section). Then a bundled `dep.lua` script will use this `meta.yaml` file to install all the required dependencies to a specified location.
 2) `Makefile`. There are 2 main commands there:
 * `make dep` - This command installs all the dependencies from meta.yaml to a local folder `.rocks` inside your project (already in bundled .gitignore)
 * `make run`. After a successful installation of dependencies you can run your application. Practically it just creates a temporary folder `.tnt_{LISTEN_URI}`, `cd`'s inside and runs `tarantool init.lua`.
