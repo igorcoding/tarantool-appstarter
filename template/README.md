@@ -4,7 +4,7 @@ _your application description_
 
 ## Commands
 * `make dep` - Installs dependencies to ./.rocks folder
-* `make run` - Runs Tarantool instance locally inside the ./.tnt_{LISTEN_URI} folder. By default $LISTEN_URI = "127.0.0.1:3301"
+* `make run` - Runs Tarantool instance locally inside the ./.tnt/init folder.
 * `make test` - Runs tests from ./t folder
 
 ## dep.lua
