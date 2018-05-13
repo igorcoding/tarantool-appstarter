@@ -29,9 +29,10 @@ local function _exists(path)
     return fio.stat(path) ~= nil
 end
 
-local function _string_split(s)
+local function _string_split(s, sep)
+    sep = sep or ','
     local parts = {}
-    for word in string.gmatch(s, '([^,]+)') do
+    for word in string.gmatch(s, string.format('([^%s]+)', sep)) do
         table.insert(parts, word)
     end
     return parts
@@ -171,10 +172,19 @@ local function main()
     if only_sections == nil or only_sections.localdeps or only_sections.local_deps then
         local cwd = fio.cwd()
         for _, dep in ipairs(local_deps) do
-            fprint("Installing local dep '%s'", dep)
+            local dep_root
+            local dep_info = _string_split(dep, ':')
+            if #dep_info > 1 then
+                dep = dep_info[1]
+                dep_root = dep_info[2]
+            else
+                dep_root = fio.dirname(dep)
+            end
+            fprint("Installing local dep '%s' with root at '%s'", dep, dep_root)
             dep = fio.abspath(dep)
+            dep_root = fio.abspath(dep_root)
 
-            fio.chdir(fio.dirname(dep)) -- local rocks must be installed from within the project root
+            fio.chdir(dep_root) -- local rocks must be installed from within the project root
             local ok, res = pcall(luarocks_remove, dep, tree)
             if not ok then
                 fprint(res)

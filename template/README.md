@@ -21,7 +21,9 @@ Script that installs dependencies (luarocks for lua 5.1 is required), specified 
 * `version` - package version
 * `deps` - list of paths to rockspec files or package names (each is installed using `luarocks install` command)
 * `tntdeps` - list of paths to rockspec files or package names (each is installed using `tarantoolctl rocks install` command)
-* `localdeps` - list of paths to local rockspec files (each is installed using `luarocks make` command)
+* `localdeps` - list of paths to local rockspec files (each is installed using `luarocks make` command). You can specify dependency in either of 2 following formats:
+    - `./local/path/to/package/package.rockspec` if `*.rockspec` file is in the package root
+    - `./local/path/to/package/rockspecs/package.rockspec:./local/path/to/package` - specify the package root after the colon
 
 
 ## Deploy
