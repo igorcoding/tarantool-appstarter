@@ -44,10 +44,18 @@ local function ensure_rocksservers(path)
     end
 
     if _exists(path) then
-        local data = fio.open(path):read()
+        local f = fio.open(path)
+        local data = f:read(f:stat().size)
+        f:close()
         if data:match('rocks%.tarantool%.org') then
             fprint('Already have rocks.tarantool.org')
             return
+        end
+    else
+        local directory = fio.dirname(path)
+        if not fio.mktree(directory) then
+            fprint('Error while creating %s: %s', directory, errno.strerror())
+            os.exit(1)
         end
     end
     fprint("Patch %s with proper rocks servers", path)
@@ -144,7 +152,7 @@ local function main()
     local tnt_deps = cfg.tnt_deps or cfg.tntdeps or {}
     local local_deps = cfg.local_deps or cfg.localdeps or {}
 
-    if only_sections == nil or only_sections['deps'] then
+    if only_sections == nil or only_sections.deps then
         for _, dep in ipairs(deps) do
             fprint("Installing dep '%s'", dep)
             luarocks_install(dep, tree)
@@ -152,7 +160,7 @@ local function main()
         end
     end
 
-    if only_sections == nil or only_sections['tntdeps'] or only_sections['tnt_deps'] then
+    if only_sections == nil or only_sections.tntdeps or only_sections.tnt_deps then
         for _, dep in ipairs(tnt_deps) do
             fprint("Installing tarantool dep '%s'", dep)
             tarantoolctl_install(dep, tree)
@@ -160,7 +168,7 @@ local function main()
         end
     end
 
-    if only_sections == nil or only_sections['localdeps'] or only_sections['local_deps'] then
+    if only_sections == nil or only_sections.localdeps or only_sections.local_deps then
         local cwd = fio.cwd()
         for _, dep in ipairs(local_deps) do
             fprint("Installing local dep '%s'", dep)
