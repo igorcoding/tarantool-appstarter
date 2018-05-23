@@ -57,8 +57,8 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 # cd %{__dir}
 make
 
-mkdir -p ./%{name}-%{version}-%{release}-rocks
-tarantool dep.lua --meta-file ./meta.yaml --tree ./%{name}-%{version}-%{release}-rocks
+mkdir -p .rocks
+tarantool dep.lua --meta-file ./meta.yaml --tree ./.rocks
 
 %install
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
@@ -69,7 +69,7 @@ tarantool dep.lua --meta-file ./meta.yaml --tree ./%{name}-%{version}-%{release}
 install -d -m 0755 %{buildroot}/usr/share/%{packagename}  # for init.lua, app and extra rocks
 install -m 0644 ./init.lua %{buildroot}/usr/share/%{packagename}/
 cp -aR ./app       %{buildroot}/usr/share/%{packagename}
-cp -aR ./%{name}-%{version}-%{release}-rocks %{buildroot}/usr/share/%{packagename}/.rocks
+cp -aR ./.rocks %{buildroot}/usr/share/%{packagename}/.rocks
 
 install -d -m 0755 %{buildroot}/etc/%{packagename}  # for conf.lua
 install -m 0644 ./conf.lua %{buildroot}/etc/%{packagename}/conf.lua
