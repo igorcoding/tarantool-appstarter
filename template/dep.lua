@@ -48,8 +48,8 @@ local function ensure_rocksservers(path)
         local f = fio.open(path)
         local data = f:read(f:stat().size)
         f:close()
-        if data:match('rocks%.tarantool%.org') then
-            fprint('Already have rocks.tarantool.org')
+        if data:match('rocks%.tarantool%.org') and data:match('rocks%.moonscript%.org') then
+            fprint('Already have proper rocks servers')
             return
         end
     else
