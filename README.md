@@ -1,3 +1,5 @@
+# THIS PROJECT IS NO LONGER SUPPORTED. PLEASE USE [moonlibs/tarantoolapp](https://github.com/moonlibs/tarantoolapp)
+
 # tarantool-appstarter
 Tarantool application starter
 
